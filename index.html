@@ -61,7 +61,6 @@
             z-index: 2;
         }
 
-        /* HEADER */
         .header {
             display: flex;
             flex-wrap: wrap;
@@ -157,7 +156,6 @@
             display: inline-block;
         }
 
-        /* NAVIGATION */
         .nav {
             display: flex;
             gap: 10px;
@@ -196,7 +194,6 @@
             transform: translate(2px, 2px);
         }
 
-        /* SECTIONS */
         .section {
             display: none;
             margin-bottom: 30px;
@@ -212,7 +209,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* CARDS */
         .card {
             background: #fff;
             border: var(--border);
@@ -247,7 +243,6 @@
             box-shadow: 3px 3px 0px #000;
         }
 
-        /* TEXTAREA & INPUTS */
         .input-field {
             width: 100%;
             background: #fff;
@@ -281,7 +276,6 @@
             display: block;
         }
 
-        /* BUTTONS */
         .btn {
             display: inline-block;
             background: var(--accent);
@@ -355,7 +349,6 @@
             margin-top: 10px;
         }
 
-        /* RESULTS */
         .result-box {
             background: #000;
             color: #00ff00;
@@ -418,7 +411,6 @@
             color: #ffff00;
         }
 
-        /* LINK ITEMS */
         .link-item {
             background: #f0f0f0;
             border: 2px solid #000;
@@ -473,7 +465,6 @@
             background: var(--accent);
         }
 
-        /* LOADER */
         .loader {
             display: none;
             text-align: center;
@@ -507,7 +498,6 @@
             100% { content: ''; }
         }
 
-        /* STATS GRID */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -553,7 +543,6 @@
             color: var(--purple);
         }
 
-        /* FOOTER */
         .footer {
             border: var(--border);
             background: #000;
@@ -575,7 +564,6 @@
             text-decoration: underline;
         }
 
-        /* TOAST */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -630,7 +618,6 @@
             }
         }
 
-        /* RESPONSIVE */
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -690,7 +677,6 @@
             }
         }
 
-        /* SCROLLBAR */
         ::-webkit-scrollbar {
             width: 12px;
             height: 12px;
@@ -707,7 +693,6 @@
             background: var(--accent);
         }
 
-        /* SELECT */
         .select-field {
             width: 100%;
             background: #fff;
@@ -733,13 +718,12 @@
 <body>
 
     <div class="container">
-        <!-- HEADER -->
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">NF</div>
                 <div>
                     <div class="logo-text">NFT<span>OKEN</span></div>
-                    <div class="version-text">v1.0.0 // BRUTALISM MODE</div>
+                    <div class="version-text">v1.0.0 // BRUTALISM MODE // PROXY ENABLED</div>
                 </div>
             </div>
             <div class="header-badge">
@@ -750,7 +734,6 @@
             </div>
         </header>
 
-        <!-- NAVIGATION -->
         <nav class="nav">
             <button class="nav-btn active" data-section="generate" onclick="switchSection('generate')">
                 ⚡ Auto Generate
@@ -769,14 +752,14 @@
             </button>
         </nav>
 
-        <!-- SECTION: AUTO GENERATE -->
         <div class="section active" id="section-generate">
             <div class="card">
                 <div class="card-title">
                     <span class="card-title-icon">⚡</span> Auto Generate Token
                 </div>
                 <p style="font-size:0.8rem; margin-bottom:15px; font-family:var(--font-mono);">
-                    Generate 3 link Netflix Premium sekaligus (PC, Android, TV).
+                    Generate 3 link Netflix Premium sekaligus (PC, Android, TV).<br>
+                    <span style="color:#ff3300;">Mode: PROXY ENABLED (bypass CORS)</span>
                 </p>
                 <button class="btn" id="btnGenerate" onclick="handleAutoGenerate()">
                     ⚡ GENERATE SEKARANG
@@ -788,7 +771,6 @@
             </div>
         </div>
 
-        <!-- SECTION: CONVERT COOKIE -->
         <div class="section" id="section-convert">
             <div class="card">
                 <div class="card-title">
@@ -806,7 +788,6 @@
             </div>
         </div>
 
-        <!-- SECTION: PARSE NETSCAPE -->
         <div class="section" id="section-parse">
             <div class="card">
                 <div class="card-title">
@@ -824,7 +805,6 @@
             </div>
         </div>
 
-        <!-- SECTION: FULL WORKFLOW -->
         <div class="section" id="section-workflow">
             <div class="card">
                 <div class="card-title">
@@ -845,7 +825,6 @@
             </div>
         </div>
 
-        <!-- SECTION: STATS -->
         <div class="section" id="section-stats">
             <div class="card">
                 <div class="card-title">
@@ -879,7 +858,6 @@
             </div>
         </div>
 
-        <!-- FOOTER -->
         <footer class="footer">
             <strong>NFTOKEN SCRAPER</strong> // Brutalism UI Edition<br>
             API: <a href="https://nftoken.zone.id" target="_blank">https://nftoken.zone.id</a><br>
@@ -888,13 +866,9 @@
         </footer>
     </div>
 
-    <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
     <script>
-        // ============================================
-        // NFTokenScraper CLASS (Integrated)
-        // ============================================
         class NFTokenScraper {
             constructor(options = {}) {
                 this.baseUrl = options.baseUrl || 'https://nftoken.zone.id';
@@ -906,6 +880,12 @@
                     ...options.headers
                 };
                 this.debug = options.debug || false;
+                this.useProxy = options.useProxy !== undefined ? options.useProxy : true;
+                this.proxies = options.proxies || [
+                    'https://api.allorigins.win/raw?url=',
+                    'https://api.codetabs.com/v1/proxy?quest=',
+                    'https://corsproxy.io/?'
+                ];
             }
 
             log(...args) {
@@ -919,12 +899,44 @@
                 const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
                 try {
-                    const response = await fetch(url, {
-                        ...options,
-                        headers: { ...this.headers, ...options.headers },
-                        signal: controller.signal
-                    });
-                    return response;
+                    if (this.useProxy) {
+                        let lastError;
+                        
+                        for (const proxy of this.proxies) {
+                            try {
+                                const proxiedUrl = proxy + encodeURIComponent(url);
+                                this.log(`🔄 Mencoba proxy: ${proxy}`);
+                                
+                                const response = await fetch(proxiedUrl, {
+                                    ...options,
+                                    headers: { ...this.headers, ...options.headers },
+                                    signal: controller.signal
+                                });
+                                
+                                this.log(`✅ Proxy berhasil: ${proxy}`);
+                                return response;
+                            } catch (error) {
+                                lastError = error;
+                                this.log(`❌ Proxy gagal: ${proxy} - ${error.message}`);
+                            }
+                        }
+                        
+                        // Kalau semua proxy gagal, coba direct
+                        this.log('⚠️ Semua proxy gagal, mencoba direct...');
+                        const directResponse = await fetch(url, {
+                            ...options,
+                            headers: { ...this.headers, ...options.headers },
+                            signal: controller.signal
+                        });
+                        return directResponse;
+                    } else {
+                        const response = await fetch(url, {
+                            ...options,
+                            headers: { ...this.headers, ...options.headers },
+                            signal: controller.signal
+                        });
+                        return response;
+                    }
                 } finally {
                     clearTimeout(timeoutId);
                 }
@@ -1192,7 +1204,8 @@
                     baseUrl: this.baseUrl,
                     timeout: this.timeout,
                     debug: this.debug,
-                    version: '1.0.0',
+                    useProxy: this.useProxy,
+                    version: '1.1.0',
                     endpoints: {
                         autoGenerate: `${this.baseUrl}/api/auto-generate`,
                         convert: `${this.baseUrl}/api/convert`,
@@ -1207,17 +1220,12 @@
             }
         }
 
-        // ============================================
-        // GLOBAL INSTANCE
-        // ============================================
         const scraper = new NFTokenScraper({
             debug: true,
-            timeout: 30000
+            timeout: 30000,
+            useProxy: true
         });
 
-        // ============================================
-        // UI FUNCTIONS
-        // ============================================
         let currentSection = 'generate';
 
         function switchSection(section) {
@@ -1326,9 +1334,6 @@
             copyToClipboard(url);
         }
 
-        // ============================================
-        // HANDLERS
-        // ============================================
         async function handleAutoGenerate() {
             const btn = document.getElementById('btnGenerate');
             const loader = document.getElementById('loaderGenerate');
@@ -1361,7 +1366,7 @@
                 showResult('resultGenerate', html, false);
                 showToast('AUTO GENERATE BERHASIL ✅', 'success');
             } catch (error) {
-                const html = `<div class="result-header"><span>❌ ERROR</span></div><p class="error-text">${escapeHTML(error.message)}</p>`;
+                const html = `<div class="result-header"><span>❌ ERROR</span></div><p class="error-text">${escapeHTML(error.message)}</p><p class="warning-text">Coba lagi atau periksa koneksi internet.</p>`;
                 showResult('resultGenerate', html, true);
                 showToast('GENERATE GAGAL ❌', 'error');
             } finally {
@@ -1551,6 +1556,7 @@
                 html += `<p>Timeout: ${stats.timeout}ms</p>`;
                 html += `<p>Version: ${escapeHTML(stats.version)}</p>`;
                 html += `<p>Debug Mode: ${stats.debug ? 'ON' : 'OFF'}</p>`;
+                html += `<p>Proxy Mode: ${stats.useProxy ? 'ENABLED' : 'DISABLED'}</p>`;
                 html += `<p class="warning-text">Endpoints:</p>`;
                 html += `<p>  • Auto Generate: ${escapeHTML(stats.endpoints.autoGenerate)}</p>`;
                 html += `<p>  • Convert: ${escapeHTML(stats.endpoints.convert)}</p>`;
@@ -1585,15 +1591,9 @@
             statusBtn.classList.remove('offline');
 
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-                const response = await fetch('https://nftoken.zone.id/api/health', {
-                    method: 'GET',
-                    signal: controller.signal
+                const response = await scraper.fetchWithTimeout('https://nftoken.zone.id/api/health', {
+                    method: 'GET'
                 });
-
-                clearTimeout(timeoutId);
 
                 if (response.ok) {
                     statusBtn.textContent = 'STATUS: ONLINE ✅';
@@ -1611,17 +1611,15 @@
             }
         }
 
-        // ============================================
-        // INITIALIZATION
-        // ============================================
         document.addEventListener('DOMContentLoaded', () => {
             checkAPIStatus();
             console.log('NFToken Brutalism UI Loaded ✅');
             console.log('Scraper instance:', scraper);
             console.log('Base URL:', scraper.baseUrl);
+            console.log('Proxy Mode:', scraper.useProxy ? 'ENABLED' : 'DISABLED');
+            console.log('Proxies:', scraper.proxies);
         });
 
-        // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === '1') {
                 e.preventDefault();
