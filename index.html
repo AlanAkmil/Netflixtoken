@@ -723,14 +723,14 @@
                 <div class="logo-icon">NF</div>
                 <div>
                     <div class="logo-text">NFT<span>OKEN</span></div>
-                    <div class="version-text">v1.0.0 // BRUTALISM MODE // PROXY ENABLED</div>
+                    <div class="version-text">v2.0.0 // SERVERLESS PROXY MODE</div>
                 </div>
             </div>
             <div class="header-badge">
                 <button class="status-badge" id="statusBtn" onclick="checkAPIStatus()">
                     STATUS: CHECKING...
                 </button>
-                <span class="version-text">API: https://nftoken.zone.id</span>
+                <span class="version-text">Proxy: Vercel Serverless</span>
             </div>
         </header>
 
@@ -759,7 +759,7 @@
                 </div>
                 <p style="font-size:0.8rem; margin-bottom:15px; font-family:var(--font-mono);">
                     Generate 3 link Netflix Premium sekaligus (PC, Android, TV).<br>
-                    <span style="color:#ff3300;">Mode: PROXY ENABLED (bypass CORS)</span>
+                    <span style="color:#ff3300;">Mode: Serverless Proxy (No CORS Issues)</span>
                 </p>
                 <button class="btn" id="btnGenerate" onclick="handleAutoGenerate()">
                     ⚡ GENERATE SEKARANG
@@ -871,21 +871,12 @@
     <script>
         class NFTokenScraper {
             constructor(options = {}) {
-                this.baseUrl = options.baseUrl || 'https://nftoken.zone.id';
-                this.timeout = options.timeout || 30000;
+                this.baseUrl = '';
+                this.timeout = options.timeout || 60000;
                 this.headers = {
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36',
-                    'Referer': `${this.baseUrl}/`,
-                    ...options.headers
+                    'Content-Type': 'application/json'
                 };
                 this.debug = options.debug || false;
-                this.useProxy = options.useProxy !== undefined ? options.useProxy : true;
-                this.proxies = options.proxies || [
-                    'https://api.allorigins.win/raw?url=',
-                    'https://api.codetabs.com/v1/proxy?quest=',
-                    'https://corsproxy.io/?'
-                ];
             }
 
             log(...args) {
@@ -896,47 +887,23 @@
 
             async fetchWithTimeout(url, options = {}) {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                    this.log('⏰ TIMEOUT! Request aborted setelah', this.timeout, 'ms');
+                }, this.timeout);
 
                 try {
-                    if (this.useProxy) {
-                        let lastError;
-                        
-                        for (const proxy of this.proxies) {
-                            try {
-                                const proxiedUrl = proxy + encodeURIComponent(url);
-                                this.log(`🔄 Mencoba proxy: ${proxy}`);
-                                
-                                const response = await fetch(proxiedUrl, {
-                                    ...options,
-                                    headers: { ...this.headers, ...options.headers },
-                                    signal: controller.signal
-                                });
-                                
-                                this.log(`✅ Proxy berhasil: ${proxy}`);
-                                return response;
-                            } catch (error) {
-                                lastError = error;
-                                this.log(`❌ Proxy gagal: ${proxy} - ${error.message}`);
-                            }
-                        }
-                        
-                        // Kalau semua proxy gagal, coba direct
-                        this.log('⚠️ Semua proxy gagal, mencoba direct...');
-                        const directResponse = await fetch(url, {
-                            ...options,
-                            headers: { ...this.headers, ...options.headers },
-                            signal: controller.signal
-                        });
-                        return directResponse;
-                    } else {
-                        const response = await fetch(url, {
-                            ...options,
-                            headers: { ...this.headers, ...options.headers },
-                            signal: controller.signal
-                        });
-                        return response;
+                    const response = await fetch(url, {
+                        ...options,
+                        headers: { ...this.headers, ...options.headers },
+                        signal: controller.signal
+                    });
+                    return response;
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        throw new Error(`Request timeout setelah ${this.timeout}ms. Coba lagi.`);
                     }
+                    throw error;
                 } finally {
                     clearTimeout(timeoutId);
                 }
@@ -946,12 +913,13 @@
                 this.log('⚡ Memulai auto generate...');
 
                 try {
-                    const response = await this.fetchWithTimeout(`${this.baseUrl}/api/auto-generate`, {
+                    const response = await this.fetchWithTimeout('/api/auto-generate', {
                         method: 'POST'
                     });
 
                     if (!response.ok) {
-                        throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || `HTTP Error: ${response.status} ${response.statusText}`);
                     }
 
                     const data = await response.json();
@@ -980,7 +948,7 @@
                 }
 
                 try {
-                    const response = await this.fetchWithTimeout(`${this.baseUrl}/api/convert`, {
+                    const response = await this.fetchWithTimeout('/api/convert', {
                         method: 'POST',
                         body: JSON.stringify({ cookie: cookie.trim() })
                     });
@@ -1012,7 +980,7 @@
                 }
 
                 try {
-                    const response = await this.fetchWithTimeout(`${this.baseUrl}/api/parse-netscape`, {
+                    const response = await this.fetchWithTimeout('/api/parse-netscape', {
                         method: 'POST',
                         body: JSON.stringify({ netscape: netscape.trim() })
                     });
@@ -1201,15 +1169,14 @@
 
             getStats() {
                 return {
-                    baseUrl: this.baseUrl,
+                    baseUrl: 'Vercel Serverless Proxy',
                     timeout: this.timeout,
                     debug: this.debug,
-                    useProxy: this.useProxy,
-                    version: '1.1.0',
+                    version: '2.0.0',
                     endpoints: {
-                        autoGenerate: `${this.baseUrl}/api/auto-generate`,
-                        convert: `${this.baseUrl}/api/convert`,
-                        parseNetscape: `${this.baseUrl}/api/parse-netscape`
+                        autoGenerate: '/api/auto-generate',
+                        convert: '/api/convert',
+                        parseNetscape: '/api/parse-netscape'
                     },
                     supportedFormats: {
                         cookie: ['JSON Array', 'JSON Object', 'Raw String'],
@@ -1222,8 +1189,7 @@
 
         const scraper = new NFTokenScraper({
             debug: true,
-            timeout: 30000,
-            useProxy: true
+            timeout: 60000
         });
 
         let currentSection = 'generate';
@@ -1556,7 +1522,6 @@
                 html += `<p>Timeout: ${stats.timeout}ms</p>`;
                 html += `<p>Version: ${escapeHTML(stats.version)}</p>`;
                 html += `<p>Debug Mode: ${stats.debug ? 'ON' : 'OFF'}</p>`;
-                html += `<p>Proxy Mode: ${stats.useProxy ? 'ENABLED' : 'DISABLED'}</p>`;
                 html += `<p class="warning-text">Endpoints:</p>`;
                 html += `<p>  • Auto Generate: ${escapeHTML(stats.endpoints.autoGenerate)}</p>`;
                 html += `<p>  • Convert: ${escapeHTML(stats.endpoints.convert)}</p>`;
@@ -1591,11 +1556,13 @@
             statusBtn.classList.remove('offline');
 
             try {
-                const response = await scraper.fetchWithTimeout('https://nftoken.zone.id/api/health', {
+                const response = await scraper.fetchWithTimeout('/api/health', {
                     method: 'GET'
                 });
 
-                if (response.ok) {
+                const data = await response.json();
+
+                if (response.ok && data.status === 'online') {
                     statusBtn.textContent = 'STATUS: ONLINE ✅';
                     statusBtn.classList.remove('offline');
                     showToast('API ONLINE ✅', 'success');
@@ -1615,9 +1582,9 @@
             checkAPIStatus();
             console.log('NFToken Brutalism UI Loaded ✅');
             console.log('Scraper instance:', scraper);
-            console.log('Base URL:', scraper.baseUrl);
-            console.log('Proxy Mode:', scraper.useProxy ? 'ENABLED' : 'DISABLED');
-            console.log('Proxies:', scraper.proxies);
+            console.log('Mode: Serverless Proxy');
+            console.log('Base URL: Relative Path (/api/*)');
+            console.log('Timeout:', scraper.timeout, 'ms');
         });
 
         document.addEventListener('keydown', (e) => {
